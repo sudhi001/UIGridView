@@ -3,7 +3,8 @@ UIGridView
 
 UIGridView
 
-UIGridViewExample uses https://github.com/sudhi001/UIGridView Library
+Example for UIGridView is in https://github.com/sudhi001/UIGridViewExample
+
 
 Usage
 ==========
