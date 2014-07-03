@@ -34,9 +34,9 @@ import android.widget.GridView;
 /**
  * 
  * @author Sudhi.S sudhi001@icloud.com /droidsworld@gmail.com
- * @param <H>
+ * @param <Holder>
  *            Holder object Type
- * @param <D>
+ * @param <DataModel>
  *            Data source object Type
  * 
  */
