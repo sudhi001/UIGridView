@@ -128,13 +128,13 @@ Developed By
 ==========
 
 
-Sudhi S. sudhi001@icloud.com /droidsworld@gmail.com
+Sudhi S. sudhi001@icloud.com / droidsworld@gmail.com
 
 License
 ==========
 
 
-Copyright 2014 Sudhi S sudhi001@icloud.com /droidsworld@gmail.com
+Copyright 2014 Sudhi S sudhi001@icloud.com / droidsworld@gmail.com
 
 Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. You may obtain a copy of the License at
 
