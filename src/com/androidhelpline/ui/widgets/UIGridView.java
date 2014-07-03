@@ -41,17 +41,17 @@ import android.widget.GridView;
  * 
  */
 
-public class UIGridView<H, D> extends GridView {
+public class UIGridView<Holder, DataModel> extends GridView {
 
 	private final static String TAG = "UIGridView";
 	private BaseAdapter adapter;
-	private List<D> adapterArray = new ArrayList<D>();
+	private List<DataModel> adapterArray = new ArrayList<DataModel>();
 	private int viewLayoutResId = 0;
 	private Method mOnCreateView;
 	private Method mOnViewCreated;
 	LayoutInflater inflater;
 	private boolean isDelegateFunctionOnActivity = false;
-	private UIGridViewDataSource<H, D> datasourse;
+	private UIGridViewDataSource<Holder, DataModel> datasourse;
 
 	public UIGridView(Context context) {
 		this(context, null);
@@ -117,11 +117,11 @@ public class UIGridView<H, D> extends GridView {
 		return datasourse;
 	}
 
-	public void setDatasourse(UIGridViewDataSource<H, D> datasourse) {
+	public void setDatasourse(UIGridViewDataSource<Holder, DataModel> datasourse) {
 		this.datasourse = datasourse;
 	}
 
-	public void setAdapterArray(List<D> adapterArray) {
+	public void setAdapterArray(List<DataModel> adapterArray) {
 
 		this.adapterArray = adapterArray;
 		adapter = new SimpleDataAdapter();
@@ -129,7 +129,7 @@ public class UIGridView<H, D> extends GridView {
 		adapter.notifyDataSetChanged();
 	}
 
-	public void setUiAdapterArray(List<D> adapterArray) {
+	public void setUiAdapterArray(List<DataModel> adapterArray) {
 		this.adapterArray = adapterArray;
 		adapter = new UIGridViewAdapter();
 		this.setAdapter(adapter);
@@ -165,16 +165,16 @@ public class UIGridView<H, D> extends GridView {
 		@SuppressWarnings("unchecked")
 		@Override
 		public View getView(int i, View view, ViewGroup viewGroup) {
-			H holder = null;
+			Holder holder = null;
 			try {
 				if (view == null) {
 					view = inflater.inflate(viewLayoutResId, viewGroup, false);
-					holder = (H) mOnCreateView.invoke(getContext(), view);
+					holder = (Holder) mOnCreateView.invoke(getContext(), view);
 					view.setTag(holder);
 				} else {
-					holder = (H) view.getTag();
+					holder = (Holder) view.getTag();
 				}
-				D d = (D) getItem(i);
+				DataModel d = (DataModel) getItem(i);
 				mOnViewCreated.invoke(getContext(), view, holder, d);
 			} catch (Exception e) {
 				Log.e(TAG, e.getLocalizedMessage());
@@ -204,24 +204,24 @@ public class UIGridView<H, D> extends GridView {
 		@SuppressWarnings("unchecked")
 		@Override
 		public View getView(int position, View convertView, ViewGroup parent) {
-			H h;
+			Holder h;
 			if (convertView == null) {
-				h = (H) datasourse.holderForUIGridView();
+				h = (Holder) datasourse.holderForUIGridView();
 				convertView = (View) inflater.inflate(viewLayoutResId, parent,
 						false);
 				datasourse.onCreateUIGridViewView(convertView, h);
 				convertView.setTag(h);
 			} else {
-				h = (H) convertView.getTag();
+				h = (Holder) convertView.getTag();
 			}
 
-			D d = (D) getItem(position);
+			DataModel d = (DataModel) getItem(position);
 			datasourse.onUIGridViewViewCreated(convertView, h, d);
 			return convertView;
 		}
 	}
 
-	public interface UIGridViewDataSource<H, D> {
+	public interface UIGridViewDataSource<H, DataModel> {
 
 		/**
 		 * Create Class For Holding View Objects
@@ -248,7 +248,7 @@ public class UIGridView<H, D> extends GridView {
 		 * @param item
 		 *            item Object For Each Row
 		 */
-		public void onUIGridViewViewCreated(View view, H holder, D item);
+		public void onUIGridViewViewCreated(View view, H holder, DataModel item);
 	}
 
 }
