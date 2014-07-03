@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <declare-styleable name="UIGridView">
+        <attr name="viewLayout" format="integer" />
+        <attr name="onCreateView" format="string" />
+        <attr name="onViewCreated" format="string" />
+        <attr name="delegateFunctionOnActivity" format="boolean" />
+    </declare-styleable>  
+
+</resources>
