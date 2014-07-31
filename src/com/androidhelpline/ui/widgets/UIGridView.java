@@ -43,212 +43,268 @@ import android.widget.GridView;
 
 public class UIGridView<Holder, DataModel> extends GridView {
 
-	private final static String TAG = "UIGridView";
-	private BaseAdapter adapter;
-	private List<DataModel> adapterArray = new ArrayList<DataModel>();
-	private int viewLayoutResId = 0;
-	private Method mOnCreateView;
-	private Method mOnViewCreated;
-	LayoutInflater inflater;
-	private boolean isDelegateFunctionOnActivity = false;
-	private UIGridViewDataSource<Holder, DataModel> datasourse;
+	  private final static String TAG = "UIGridView";
+    private BaseAdapter adapter;
+    private List<DataModel> adapterArray = new ArrayList<DataModel>();
+    private UIGridViewDataSource<Holder, DataModel> datasourse;
+    LayoutInflater inflater;
+    private boolean isDelegateFunctionOnActivity = false;
 
-	public UIGridView(Context context) {
-		this(context, null);
-	}
+    private Method mOnCreateView;
 
-	public UIGridView(Context context, AttributeSet attrs) {
-		super(context, attrs);
-		init(attrs);
-	}
+    private Method mOnViewCreated;
 
-	public UIGridView(Context context, AttributeSet attrs, int defStyle) {
-		super(context, attrs, defStyle);
-		init(attrs);
-	}
+    private int viewLayoutResId = 0;
 
-	private void init(AttributeSet attrs) {
-		inflater = (LayoutInflater) getContext().getSystemService(
-				Context.LAYOUT_INFLATER_SERVICE);
+    public UIGridView(Context context) {
+        this(context, null);
+    }
 
-		if (attrs != null) {
-			TypedArray a = getContext().obtainStyledAttributes(attrs,
-					R.styleable.UIGridView);
-			try {
-				viewLayoutResId = a.getResourceId(
-						R.styleable.UIGridView_viewLayout,
-						android.R.layout.simple_list_item_1);
-				final String onCreateView = a
-						.getString(R.styleable.UIGridView_onCreateView);
-				final String onViewCreated = a
-						.getString(R.styleable.UIGridView_onViewCreated);
-				isDelegateFunctionOnActivity = a.getBoolean(
-						R.styleable.UIGridView_delegateFunctionOnActivity,
-						false);
-				if (onCreateView != null && onViewCreated != null
-						&& !isDelegateFunctionOnActivity) {
-					try {
-						mOnCreateView = getContext().getClass().getMethod(
-								onCreateView, View.class);
-					} catch (NoSuchMethodException e) {
-						Log.e(TAG, "No Such Methode in tag Named onCreateView");
-					}
-					try {
-						mOnViewCreated = getContext().getClass().getMethod(
-								onViewCreated, View.class, Object.class,
-								Object.class);
+    public UIGridView(Context context, AttributeSet attrs) {
+        super(context, attrs);
+        init(attrs);
+    }
 
-					} catch (NoSuchMethodException e) {
-						Log.e(TAG, "No Such Methode in tag Named onViewCreated");
+    public UIGridView(Context context, AttributeSet attrs, int defStyle) {
+        super(context, attrs, defStyle);
+        init(attrs);
+    }
 
-					}
-				}
-			} catch (Exception e) {
-				Log.e(TAG, e.getLocalizedMessage());
-			} finally {
+    public UIGridViewDataSource<?, ?> getDatasourse() {
+        return datasourse;
+    }
 
-				a.recycle();
-			}
-		}
+    private void init(AttributeSet attrs) {
+        inflater = (LayoutInflater) getContext().getSystemService(
+                Context.LAYOUT_INFLATER_SERVICE);
 
-	}
+        if (attrs != null) {
+            TypedArray a = getContext().obtainStyledAttributes(attrs,
+                    R.styleable.UIGridView);
+            try {
+                viewLayoutResId = a.getResourceId(
+                        R.styleable.UIGridView_viewLayout,
+                        android.R.layout.simple_list_item_1);
+                final String onCreateView = a
+                        .getString(R.styleable.UIGridView_onCreateView);
+                final String onViewCreated = a
+                        .getString(R.styleable.UIGridView_onViewCreated);
+                isDelegateFunctionOnActivity = a.getBoolean(
+                        R.styleable.UIGridView_delegateFunctionOnActivity,
+                        false);
+                if (onCreateView != null && onViewCreated != null
+                        && !isDelegateFunctionOnActivity) {
+                    try {
+                        mOnCreateView = getContext().getClass().getMethod(
+                                onCreateView, View.class);
+                    } catch (NoSuchMethodException e) {
+                        Log.e(TAG, "No Such Methode in tag Named onCreateView");
+                    }
+                    try {
+                        mOnViewCreated = getContext().getClass().getMethod(
+                                onViewCreated, View.class, Object.class,
+                                Object.class);
 
-	public UIGridViewDataSource<?, ?> getDatasourse() {
-		return datasourse;
-	}
+                    } catch (NoSuchMethodException e) {
+                        Log.e(TAG, "No Such Methode in tag Named onViewCreated");
 
-	public void setDatasourse(UIGridViewDataSource<Holder, DataModel> datasourse) {
-		this.datasourse = datasourse;
-	}
+                    }
+                }
+            } catch (Exception e) {
+                Log.e(TAG, e.getLocalizedMessage());
+            } finally {
 
-	public void setAdapterArray(List<DataModel> adapterArray) {
+                a.recycle();
+            }
+        }
+    }
 
-		this.adapterArray = adapterArray;
-		adapter = new SimpleDataAdapter();
-		this.setAdapter(adapter);
-		adapter.notifyDataSetChanged();
-	}
+    public void notifyDataSetChange() {
+        adapter.notifyDataSetChanged();
+        adapter.notifyDataSetInvalidated();
+    }
 
-	public void setUiAdapterArray(List<DataModel> adapterArray) {
-		this.adapterArray = adapterArray;
-		adapter = new UIGridViewAdapter();
-		this.setAdapter(adapter);
-		adapter.notifyDataSetChanged();
-	}
+    public void removeData(Object object) {
+        this.adapterArray.remove(object);
+    }
 
-	public void removeData(Object object) {
-		this.adapterArray.remove(object);
-	}
+    public void setAdapterArray(List<DataModel> adapterArray) {
 
-	public void notifyDataSetChange() {
-		adapter.notifyDataSetChanged();
-		adapter.notifyDataSetInvalidated();
-	}
+        this.adapterArray = adapterArray;
+        adapter = new SimpleDataAdapter();
+        this.setAdapter(adapter);
+        adapter.notifyDataSetChanged();
+    }
 
-	private class SimpleDataAdapter extends BaseAdapter {
+    public void setDatasourse(UIGridViewDataSource<Holder, DataModel> datasourse) {
+        this.datasourse = datasourse;
+    }
 
-		@Override
-		public int getCount() {
-			return adapterArray.size();
-		}
+    public void setUiAdapterArray(List<DataModel> adapterArray) {
+        this.adapterArray = adapterArray;
+        adapter = new UIGridViewAdapter(this.adapterArray);
+        this.setAdapter(adapter);
+        adapter.notifyDataSetChanged();
+    }
 
-		@Override
-		public Object getItem(int i) {
-			return adapterArray.get(i);
-		}
+    @SuppressWarnings("unchecked")
+    public UIGridViewAdapter getUIGridViewAdapter()
+    {
+        return (UIGridView<Holder, DataModel>.UIGridViewAdapter) adapter;
+    }
 
-		@Override
-		public long getItemId(int i) {
-			return 0;
-		}
+    private class SimpleDataAdapter extends BaseAdapter {
 
-		@SuppressWarnings("unchecked")
-		@Override
-		public View getView(int i, View view, ViewGroup viewGroup) {
-			Holder holder = null;
-			try {
-				if (view == null) {
-					view = inflater.inflate(viewLayoutResId, viewGroup, false);
-					holder = (Holder) mOnCreateView.invoke(getContext(), view);
-					view.setTag(holder);
-				} else {
-					holder = (Holder) view.getTag();
-				}
-				DataModel d = (DataModel) getItem(i);
-				mOnViewCreated.invoke(getContext(), view, holder, d);
-			} catch (Exception e) {
-				Log.e(TAG, e.getLocalizedMessage());
-			}
-			return view;
+        @Override
+        public int getCount() {
+            return adapterArray.size();
+        }
 
-		}
-	}
+        @Override
+        public Object getItem(int i) {
+            return adapterArray.get(i);
+        }
 
-	public class UIGridViewAdapter extends BaseAdapter {
+        @Override
+        public long getItemId(int i) {
+            return 0;
+        }
 
-		@Override
-		public int getCount() {
-			return adapterArray.size();
-		}
+        @SuppressWarnings("unchecked")
+        @Override
+        public View getView(int i, View view, ViewGroup viewGroup) {
+            Holder holder = null;
+            try {
+                if (view == null) {
+                    view = inflater.inflate(viewLayoutResId, viewGroup, false);
+                    holder = (Holder) mOnCreateView.invoke(getContext(), view);
+                    view.setTag(holder);
+                } else {
+                    holder = (Holder) view.getTag();
+                }
+                DataModel d = (DataModel) getItem(i);
+                mOnViewCreated.invoke(getContext(), view, holder, d);
+            } catch (Exception e) {
+                Log.e(TAG, e.getStackTrace().toString());
+            }
+            return view;
 
-		@Override
-		public Object getItem(int position) {
-			return adapterArray.get(position);
-		}
+        }
+    }
 
-		@Override
-		public long getItemId(int position) {
-			return position;
-		}
+    public class UIGridViewAdapter extends BaseAdapter implements
+            Filterable {
+        List<DataModel> mDatas;
+        List<DataModel> mOriginalData;
 
-		@SuppressWarnings("unchecked")
-		@Override
-		public View getView(int position, View convertView, ViewGroup parent) {
-			Holder h;
-			if (convertView == null) {
-				h = (Holder) datasourse.holderForUIGridView();
-				convertView = (View) inflater.inflate(viewLayoutResId, parent,
-						false);
-				datasourse.onCreateUIGridViewView(convertView, h);
-				convertView.setTag(h);
-			} else {
-				h = (Holder) convertView.getTag();
-			}
+        public UIGridViewAdapter(List<DataModel> mList) {
+            this.mOriginalData = mList;
+            this.mDatas = new ArrayList<DataModel>(mOriginalData);
+        }
 
-			DataModel d = (DataModel) getItem(position);
-			datasourse.onUIGridViewViewCreated(convertView, h, d);
-			return convertView;
-		}
-	}
+        @Override
+        public int getCount() {
+            return mDatas.size();
+        }
 
-	public interface UIGridViewDataSource<H, DataModel> {
+        @Override
+        public Object getItem(int position) {
+            return mDatas.get(position);
+        }
 
-		/**
-		 * Create Class For Holding View Objects
-		 * 
-		 * @return View Holder object
-		 */
-		public H holderForUIGridView();
+        @Override
+        public long getItemId(int position) {
+            return position;
+        }
 
-		/**
-		 * Call This Function only Once
-		 * 
-		 * @param view
-		 * @param holder
-		 *            View Holder Object
-		 */
-		public void onCreateUIGridViewView(View view, H holder);
+        @SuppressWarnings("unchecked")
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+            Holder h;
+            if (convertView == null) {
+                h = (Holder) datasourse.holderForUIGridView();
+                convertView = (View) inflater.inflate(viewLayoutResId, parent,
+                        false);
+                datasourse.onCreateUIGridViewView(convertView, h);
+                convertView.setTag(h);
+            } else {
+                h = (Holder) convertView.getTag();
+            }
 
-		/**
-		 * Call this function for every list item
-		 * 
-		 * @param view
-		 * @param holder
-		 *            View Holder Object
-		 * @param item
-		 *            item Object For Each Row
-		 */
-		public void onUIGridViewViewCreated(View view, H holder, DataModel item);
-	}
+            DataModel d = (DataModel) getItem(position);
+            datasourse.onUIGridViewViewCreated(convertView, h, d, position);
+            return convertView;
+        }
+
+        @Override
+        public Filter getFilter() {
+
+            return new Filter() {
+
+                @Override
+                protected FilterResults performFiltering(CharSequence constraint) {
+                    constraint = constraint.toString().toLowerCase();
+
+                    FilterResults result = new FilterResults();
+
+                    if (constraint != null
+                            && constraint.toString().length() > 0) {
+                        List<DataModel> founded = new ArrayList<DataModel>();
+                        for (DataModel item : mOriginalData) {
+                            datasourse.onFilter(founded, item, constraint);
+                        }
+
+                        result.values = founded;
+                        result.count = founded.size();
+                    } else {
+                        result.values = mOriginalData;
+                        result.count = mOriginalData.size();
+                    }
+                    return result;
+
+                }
+
+                @SuppressWarnings("unchecked")
+                @Override
+                protected void publishResults(CharSequence constraint,
+                        FilterResults results) {
+                    mDatas = (List<DataModel>) results.values;
+                    notifyDataSetChanged();
+
+                }
+
+            };
+        }
+    }
+
+    public interface UIGridViewDataSource<H, DataModel> {
+
+        /**
+         * Create Class For Holding View Objects
+         * 
+         * @return View Holder object
+         */
+        public H holderForUIGridView();
+
+        /**
+         * Call This Function only Once
+         * 
+         * @param view
+         * @param holder View Holder Object
+         */
+        public void onCreateUIGridViewView(View view, H holder);
+
+        /**
+         * Call this function for every list item
+         * 
+         * @param view
+         * @param holder View Holder Object
+         * @param item item Object For Each Row
+         */
+        public void onUIGridViewViewCreated(View view, H holder, DataModel item, int position);
+
+        public void onFilter(List<DataModel> mList, DataModel item, CharSequence constraint);
+
+    }
 
 }
